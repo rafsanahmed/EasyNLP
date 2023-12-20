@@ -4,9 +4,11 @@
   "ignore": {
     "cord_loader": true,
     "downloader": true,
+    "downloader_ft": false,
     "text_loader":true,
     "pubmed_bulk_loader":false,
     "splitter": true,
+    "splitter_ft": false,
     "ner": true,
     "analysis": true,
     "merger": true,
@@ -17,6 +19,11 @@
     "input_path": "data/Lund-Autophagy-1.txt",
     "output_path": "results/dataloader/text.json",
     "batch_size": 100 
+  },
+  "downloader_ft": {
+    "input_path": "pmid-1.txt",
+    "output_path": "results/dataloader/pmid-1.txt.json",
+    "max_threads": 1
   },
   "cord_loader": {
     "input_path": "data/metadata.csv",
@@ -48,6 +55,11 @@
     "tokenizer": "spacy",
     "model_name": "en_core_web_sm",
     "batch_size": 100
+  },
+  "splitter_ft": {
+    "input_path": "results/dataloader/pmid-1.txt.json",
+    "output_path": "results/splitter/pmid-1.sentences.json",
+    "split": "paragraphs",
   },
   "ner": {
     "input_path": "results/splitter/",

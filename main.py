@@ -22,6 +22,8 @@ from scripts import entity_merger
 from scripts import ner_main
 from scripts import analysis
 from scripts import pubmed_bulk
+from scripts import downloader_ft
+from scripts import splitter_ft
 
 
 def run_cord_loader(cord_loader_config: dict, ignore: bool):
@@ -256,6 +258,34 @@ def run_merger(config: dict, ignore: bool):
     
     print("Finished running merger script.")
 
+def run_downloader_ft(dl_ft_config: dict, ignore: bool):
+    if ignore:
+        print("Ignoring script: downloader_ft.")
+        return
+
+    print("Running downloader_ft script.")
+    print(dl_ft_config)
+    downloader_ft.run(
+        input_file=dl_ft_config["input_path"],
+        output_file=dl_ft_config["output_path"],
+        max_threads=dl_ft_config["max_threads"],
+    )
+    print("Finished running downloader_ft script.")
+
+def run_splitter_ft(dl_ft_config: dict, ignore: bool):
+    if ignore:
+        print("Ignoring script: splitter_ft.")
+        return
+
+    print("Running splitter_ft script.")
+    print(dl_ft_config)
+    splitter_ft.run(
+        input_file=dl_ft_config["input_path"],
+        output_file=dl_ft_config["output_path"],
+        split=dl_ft_config["split"],
+    )
+    print("Finished running splitter_ft script.")
+
 if __name__ == "__main__":
     print("Please see config.json for configuration!")
 
@@ -309,4 +339,10 @@ if __name__ == "__main__":
     run_merger(config, ignore=ignore["merger"])
     print()
 
+    run_downloader_ft(config["downloader_ft"], ignore=ignore["downloader_ft"])
+    print()
+
+    run_splitter_ft(config["splitter_ft"], ignore=ignore["splitter_ft"])
+    print()
+    
     print("Program finished successfully.")
