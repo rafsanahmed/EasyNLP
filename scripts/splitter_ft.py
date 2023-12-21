@@ -39,15 +39,6 @@ def extract_fulltext_data(data: dict, allowed_sections=[], ignored_sections=[]) 
         return section_texts
 
 # Extract ID from JSON.
-'''
-{
-      "documents": [
-        {
-          "id": "9950460",
-          "infons": {
-            "license": "CC BY"
-          },
-'''
 def extract_metadata(data: dict) -> str:
     if not "documents" in data:
         return "unknown"
@@ -55,24 +46,8 @@ def extract_metadata(data: dict) -> str:
         if len(data['documents']) > 0:
             id = data["documents"][0]["id"]
             return id
-'''
-"documents": [
-        {
-          "id": "9950460",
-          "infons": {
-            "license": "CC BY"
-          },
-          "passages": [
-            {
-              "offset": 0,
-              "infons": {
-                "article-id_doi": "10.1038/s41418-022-01094-w",
-                "article-id_pmc": "9950460",
-                "article-id_pmid": "36447047",
-                "year": "2023"
-              },
-              "text": "Mitochondria and cell death-associated inflammation",
-'''
+
+# Extract the title.
 def extract_title(data: dict) -> str:
     if not "documents" in data:
         return "unknown"
@@ -125,18 +100,22 @@ def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split=
     with open(filename, "r") as fin:
         data = json.loads(fin.read())
     fulltexts = data["fulltexts"]
+
+    # Calculate/create batches?
+    batch_size = 100
+    current_batch_size = batch_size
+    current_batch_number = 0
+    
     full_output = {}
+    full_batch_output = []
     for ft in fulltexts:
         #print(ft)
         # produces output like:
         # {'TITLE': ['Advances in mechanism and regulation of PANoptosis: Prospects in disease
         #             treatment'], 'ABSTRACT': ['PANoptosis, a new research ...
         st = extract_fulltext_data(ft, allowed_sections=allowed_sections, ignored_sections=ignored_sections)
-        #print("\n", st, "\n")
         md = extract_metadata(ft)
-        #print(md)
         title = extract_title(ft)
-        #print(title)
         if split == "sentences":
             ss = texts_to_sentences(st)
         else:
@@ -154,18 +133,40 @@ def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split=
                 text_json["text"] = sentence
                 output["sentences"].append(text_json) #sentence)
         full_output[md] = output
-    return json.dumps(full_output)
+        current_batch_size -= 1
+        if current_batch_size <= 0:
+            full_batch_output.append(full_output)
+            full_output = {}
+            current_batch_size = batch_size
+            current_batch_number += 1
+    
+    #return json.dumps(full_output)
+    #full_batch_output.append(json.dumps(full_output)) # The left-overs.
+    full_batch_output.append(full_output) # The left-overs.
+    return full_batch_output
 
 def run(input_file, output_file, split):
     full_texts = bulk_to_sentences(input_file, allowed_sections=[],
                                    ignored_sections=["ACK_FUND", "AUTH_CONT", "COMP_INT", "FIG", "TABLE",
                                                      "ABBR", "REF"],
                                    split=split)
-    output_dir = os.path.dirname(output_file)
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-    with open(output_file, "w") as fout:
-        fout.write(full_texts)
-
+    if len(full_texts) == 1:
+        output_dir = os.path.dirname(output_file)
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w") as fout:
+            fout.write(json.dumps(full_texts[0]))
+    else:
+        output_dir = os.path.dirname(output_file)
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        stem = Path(output_file).stem
+        suffix = Path(output_file).suffix
+        path = os.path.dirname(output_file)
+        for i, ft in enumerate(full_texts):
+            if len(ft) > 0:
+                output_file = os.path.join(path, stem+"-{:02n}".format(i)+suffix)
+                with open(output_file, "w") as fout:
+                    fout.write(json.dumps(ft))
+        
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         full_texts = bulk_to_sentences(sys.argv[1], split="sentences")

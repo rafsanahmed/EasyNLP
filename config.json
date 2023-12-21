@@ -23,7 +23,7 @@
   "downloader_ft": {
     "input_path": "data/pmid-1.txt",
     "output_path": "results/dataloader/pmid-1.txt.json",
-    "max_threads": 1
+    "max_threads": 8
   },
   "cord_loader": {
     "input_path": "data/metadata.csv",
