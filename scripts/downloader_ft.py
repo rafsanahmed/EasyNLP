@@ -1,5 +1,4 @@
 # coding=utf-8
-
 import json
 import os
 import pubmed_parser as pp
@@ -13,6 +12,8 @@ from typing import Any, List
 
 from queue import Queue
 from threading import Thread
+
+from pathlib import Path
 
 def download_file(pmcid, queue, counter):
     """
@@ -54,50 +55,15 @@ def handle_queue(queue, output_file, counter):
     # We need to check for the isdir property because the file might
     # not exists (yet).
     if not os.path.isdir(output_file):
-        print("create file")
+        output_dir = os.path.dirname(output_file)
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
         with open(output_file, 'w') as fout:
             fout.write("{\"fulltexts\": [\n");
-        
+
     while True:
         pmcid, data, counter = queue.get()
         if pmcid is None:  # This is the signal to stop the handler
             break
-
-        #print(json.dumps(data["documents"], sort_keys=True, indent=4))
-        '''
-        abstracts = []
-        for document in data['documents']:
-            for passage in document['passages']:
-                if passage['infons']['type'] == 'abstract':
-                    abstracts.append(passage['text'])
-        # Print extracted abstracts
-        for abstract in abstracts:
-            print(abstract)
-        '''
-        ## next
-        '''
-        type_texts = {}
-        for document in data['documents']:
-            for passage in document['passages']:
-                passage_type = passage['infons']['type']
-                passage_text = passage['text']
-                # Check if the type already exists in the dictionary
-                if passage_type in type_texts:
-                    # Append the text to the existing list
-                    type_texts[passage_type].append(passage_text)
-                else:
-                    # Create a new list for this type
-                    type_texts[passage_type] = [passage_text]
-        # Print the dictionary
-        print( type_texts.keys() )
-        '''
-        '''
-        for type_key, texts in type_texts.items():
-            print(f"Type: {type_key}")
-            for text in texts:
-                print(text)
-            print("\n")
-        '''
     
         # Save (append) the data to a file.
         # If the output_file is a directory, we save individual files.
@@ -107,7 +73,7 @@ def handle_queue(queue, output_file, counter):
                 file.write("\n")
                 print(f"Wrote {counter}: {pmcid}")
         else:
-            with open(output_file, 'a') as file:
+            with open(output_file, 'a') as file: # TODO Create parent dirs if not exist.
                 file.write(json.dumps(data))
                 file.write(",\n")
                 print(f"Appended {counter}: {pmcid}")
@@ -129,10 +95,9 @@ def download_files_parallel(pmcids:list, output_file: str, max_threads:int):
     """
     queue = Queue()
     threads = []
-    counter = 0
     
     # Start the queue handler thread
-    handler_thread = Thread(target=handle_queue, args=(queue, output_file, counter))
+    handler_thread = Thread(target=handle_queue, args=(queue, output_file, 0))
     handler_thread.start()
 
     # Start threads for downloading files
@@ -184,17 +149,16 @@ Arguments:
 ———————————————————————————————————————————————————————————————————————————————
 """
 if __name__ == "__main__":
-
     if len(sys.argv) == 3:
         input_file = sys.argv[1]
         output_file = sys.argv[2]
-        max_threads = 2  # Maximum number of parallel downloads
+        max_threads = 1  # Maximum number of parallel downloads
     elif len(sys.argv) == 4:
         input_file = sys.argv[1]
         output_file = sys.argv[2]
         max_threads = int(sys.argv[3])
     else:
         sys.exit(
-            "usage: {} input_path output_path {max_threads}".format(sys.argv[0]))
-    
+            "usage: {} input_path output_path {max_threads}".format(sys.argv[0])
+        )
     run(input_file, output_file, max_threads)

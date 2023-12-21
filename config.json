@@ -6,7 +6,7 @@
     "downloader": true,
     "downloader_ft": false,
     "text_loader":true,
-    "pubmed_bulk_loader":false,
+    "pubmed_bulk_loader":true,
     "splitter": true,
     "splitter_ft": false,
     "ner": true,
@@ -21,7 +21,7 @@
     "batch_size": 100 
   },
   "downloader_ft": {
-    "input_path": "pmid-1.txt",
+    "input_path": "data/pmid-1.txt",
     "output_path": "results/dataloader/pmid-1.txt.json",
     "max_threads": 1
   },
@@ -59,7 +59,7 @@
   "splitter_ft": {
     "input_path": "results/dataloader/pmid-1.txt.json",
     "output_path": "results/splitter/pmid-1.sentences.json",
-    "split": "paragraphs",
+    "split": "paragraphs"
   },
   "ner": {
     "input_path": "results/splitter/",
