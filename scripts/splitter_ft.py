@@ -96,13 +96,13 @@ def texts_to_paragraphs(section_texts: dict) -> dict:
 # one key "fulltexts" which is a list with articles.
 # The texts from ignored_sections are not included. Specific sections
 # can be chosen with allowed_sections (default [] means all sections).
-def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split="sentences"):
+def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split="sentences", batch_size=0):
     with open(filename, "r") as fin:
         data = json.loads(fin.read())
     fulltexts = data["fulltexts"]
 
-    # Calculate/create batches?
-    batch_size = 100
+    # Calculate/create batches. batch_size==0 means
+    # everything goes into one batch.
     current_batch_size = batch_size
     current_batch_number = 0
     
@@ -134,7 +134,7 @@ def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split=
                 output["sentences"].append(text_json) #sentence)
         full_output[md] = output
         current_batch_size -= 1
-        if current_batch_size <= 0:
+        if current_batch_size == 0:
             full_batch_output.append(full_output)
             full_output = {}
             current_batch_size = batch_size
@@ -145,31 +145,27 @@ def bulk_to_sentences(filename, allowed_sections=[], ignored_sections=[], split=
     full_batch_output.append(full_output) # The left-overs.
     return full_batch_output
 
-def run(input_file, output_file, split):
+def run(input_file, output_file, split, batch_size):
     full_texts = bulk_to_sentences(input_file, allowed_sections=[],
                                    ignored_sections=["ACK_FUND", "AUTH_CONT", "COMP_INT", "FIG", "TABLE",
                                                      "ABBR", "REF"],
-                                   split=split)
-    if len(full_texts) == 1:
-        output_dir = os.path.dirname(output_file)
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
-        with open(output_file, "w") as fout:
-            fout.write(json.dumps(full_texts[0]))
-    else:
-        output_dir = os.path.dirname(output_file)
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
-        stem = Path(output_file).stem
-        suffix = Path(output_file).suffix
-        path = os.path.dirname(output_file)
-        for i, ft in enumerate(full_texts):
-            if len(ft) > 0:
-                output_file = os.path.join(path, stem+"-{:02n}".format(i)+suffix)
-                with open(output_file, "w") as fout:
-                    fout.write(json.dumps(ft))
+                                   split=split, batch_size=batch_size)
+    output_dir = os.path.dirname(output_file)
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    stem = Path(output_file).stem
+    suffix = Path(output_file).suffix
+    path = os.path.dirname(output_file)
+    for i, ft in enumerate(full_texts):
+        if len(ft) > 0:
+            output_file = os.path.join(path, stem+"-{:02n}".format(i)+suffix)
+            with open(output_file, "w") as fout:
+                fout.write(json.dumps(ft))
         
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         full_texts = bulk_to_sentences(sys.argv[1], split="sentences")
         print(full_texts)
     elif len(sys.argv) == 4:
-        run(sys.argv[1], sys.argv[2], sys.argv[3])
+        run(sys.argv[1], sys.argv[2], sys.argv[3], 0)
+    elif len(sys.argv) == 5:
+        run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])

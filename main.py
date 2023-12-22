@@ -283,6 +283,7 @@ def run_splitter_ft(dl_ft_config: dict, ignore: bool):
         input_file=dl_ft_config["input_path"],
         output_file=dl_ft_config["output_path"],
         split=dl_ft_config["split"],
+        batch_size=dl_ft_config["batch_size"],
     )
     print("Finished running splitter_ft script.")
 

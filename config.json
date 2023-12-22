@@ -21,8 +21,8 @@
     "batch_size": 100 
   },
   "downloader_ft": {
-    "input_path": "data/pmid-1.txt",
-    "output_path": "results/dataloader/pmid-1.txt.json",
+    "input_path": "data/pmid-example.txt",
+    "output_path": "results/dataloader/pmid-example.txt.json",
     "max_threads": 8
   },
   "cord_loader": {
@@ -57,9 +57,10 @@
     "batch_size": 100
   },
   "splitter_ft": {
-    "input_path": "results/dataloader/pmid-1.txt.json",
-    "output_path": "results/splitter/pmid-1.sentences.json",
-    "split": "paragraphs"
+    "input_path": "results/dataloader/pmid-example.txt.json",
+    "output_path": "results/splitter/pmid-example.paragraphs.json",
+    "split": "paragraphs",
+    "batch_size": 100
   },
   "ner": {
     "input_path": "results/splitter/",

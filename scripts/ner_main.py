@@ -147,7 +147,7 @@ def filter_files(list_files, start, end):
         f_idx = int(os.path.splitext(os.path.basename(f))[0].split("-")[-1])
         if f_idx>=start and f_idx<=end:
             filtered_list_files.append(f)
-    
+    print(filtered_list_files) # PJB
     return filtered_list_files
 
 def biobert_process_articles(articles, column_names=["pmid", "sent_idx", "text"]):
