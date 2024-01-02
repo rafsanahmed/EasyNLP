@@ -82,7 +82,7 @@ def handle_queue(queue, output_file, counter):
 
     if os.path.isfile(output_file):
         with open(output_file, 'a') as fout:
-            fout.write("{}\n");     # We have a training comma... we need something
+            fout.write("{}\n");
             fout.write("]}\n");
 
 def download_files_parallel(pmcids:list, output_file: str, max_threads:int):
