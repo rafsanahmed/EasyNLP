@@ -5,7 +5,7 @@ The full-text downloader downloads articles by PMID which it reads from a text-f
 
 Link to free full text search: https://pubmed.ncbi.nlm.nih.gov/?term=pubmed+pmc+open+access%5Bfilter%5D&filter=simsearch2.ffrft&filter=years.1980-1989&sort=date&size=50.
 
-![[PubMedSearch.png]]
+![](PubMedSearch.png)
 
 Note that the `pubmed pmc open access[filter]` text needs to be present in the search field. More search terms can be added after the `[filter]` term. 
 
