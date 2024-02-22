@@ -6,7 +6,7 @@
     "downloader": true,
     "downloader_ft": true,
     "download_archive": false,
-    "extract_text": false,
+    "extract_text": true,
     "text_loader":true,
     "pubmed_bulk_loader":true,
     "splitter": true,
@@ -30,7 +30,7 @@
   "download_archive": {
     "archive": "PMC050XXXXX_json_unicode.tar.gz",
     "save_path": "/tmp",
-    "extract_path": "results/dataloader/archive",
+    "extract_path": "results/dataloader/archive"
   },
   "extract_text": {
       "extract_path": "results/dataloader/archive",
@@ -38,7 +38,7 @@
       "split": "sentences",
       "output_file": "output.json",
       "batch_size": 1000,
-      "max_threads": 4,
+      "max_threads": 4
   },
   "cord_loader": {
     "input_path": "data/metadata.csv",
