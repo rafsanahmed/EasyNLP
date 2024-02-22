@@ -21,7 +21,7 @@
     "batch_size": 100 
   },
   "downloader_ft": {
-    "input_path": "data/pmid-example.txt",
+    "input_path": "data/pmid-lyme-set.txt",
     "output_path": "results/dataloader/pmid-example.txt.json",
     "max_threads": 8
   },
