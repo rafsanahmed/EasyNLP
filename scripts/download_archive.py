@@ -207,7 +207,7 @@ def run_extract_text(extract_dir, output_dir, split="sentences", output_file="ou
         allow = []
         ignore = ["ACK_FUND", "AUTH_CONT", "COMP_INT", "FIG", "TABLE", "ABBR", "REF"]
         for i, batch in enumerate(chunks(files, batch_size)):
-            output_file = os.path.join(path, stem+"-{:03n}".format(i)+suffix)
+            output_file = os.path.join(path, stem+"-{:04n}".format(i)+suffix)
             output_file = os.path.join(output_dir, output_file)
             thread = Thread(target=process_files, args=(batch, output_file),
                             kwargs={'allowed_sections':allow,
@@ -235,5 +235,5 @@ if __name__ == "__main__":
         extract_dir = sys.argv[1]
         output_dir = sys.argv[2]
         # Testing with a random selection of 100000 and 12 threads.
-        run_extract_text(extract_dir, output_dir, max_threads=4, random_sel=100000)
+        run_extract_text(extract_dir, output_dir, max_threads=4)
     
