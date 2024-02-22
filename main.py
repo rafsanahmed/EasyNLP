@@ -24,7 +24,7 @@ from scripts import analysis
 from scripts import pubmed_bulk
 from scripts import downloader_ft
 from scripts import splitter_ft
-
+from scripts import download_archive
 
 def run_cord_loader(cord_loader_config: dict, ignore: bool):
     if ignore:
@@ -287,6 +287,41 @@ def run_splitter_ft(dl_ft_config: dict, ignore: bool):
     )
     print("Finished running splitter_ft script.")
 
+def run_download_archive(dl_ar_config: dict, ignore: bool):
+    if ignore:
+        print("Ignoring script: download_archive.")
+        return
+
+    print("Running download_archive script.")
+    print(dl_ar_config)
+    # def run_full_text_downloader(filename, save_dir, extract_dir):
+    downloader_archive.run_full_text_downloader(
+        dl_ft_config["archive"],
+        dl_ft_config["output_path"],
+        dl_ft_config["extract_path"]
+    )
+    print("Finished running download_archive script.")
+    
+def run_extract_text(dl_ar_config: dict, ignore: bool):
+    if ignore:
+        print("Ignoring script: extract_text.")
+        return
+
+    print("Running extract_text script.")
+    print(dl_ar_config)
+    # run_extract_text(extract_dir, output_dir, split="sentences", output_file="output.json",
+    #                  batch_size=1000, random_sel=0, max_threads=1):
+    downloader_archive.run_full_text_downloader(
+        dl_ft_config["extract_path"],
+        dl_ft_config["output_path"],
+        split=dl_ft_config["split"],
+        output_file=dl_ft_config["output_file"],
+        batch_size=dl_ft_config["batch_size"],
+        max_treads=dl_ft_config["max_threads"]
+    )
+    print("Finished running download_archive script.")
+
+    
 if __name__ == "__main__":
     print("Please see config.json for configuration!")
 
