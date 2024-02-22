@@ -380,5 +380,11 @@ if __name__ == "__main__":
 
     run_splitter_ft(config["splitter_ft"], ignore=ignore["splitter_ft"])
     print()
-    
+
+    run_full_text_downloader(config["download_archive"], ignore=ignore["download_archive"])
+    print()
+
+    run_extract_text(config["extract_text"], ignore=ignore["extract_text"])
+    print()
+
     print("Program finished successfully.")
