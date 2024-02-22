@@ -178,27 +178,27 @@ def chunks(lst, n):
 
 '''
 # Called from main.py.
-def run_full_text_downloader(filename, save_dir, extract_dir):
+def run_full_text_downloader(filename, save_path, extract_path):
     # Ensure the extraction directory exists
-    if not os.path.exists(extract_dir):
-        os.makedirs(extract_dir)
-    url = URLBASE + "/" + filename
-    save_file = save_dir + "/" + filename
+    if not os.path.exists(extract_path):
+        os.makedirs(extract_path)
+    url = os.path.join(URLBASE, filename)
+    save_file = os.path.join(save_path, filename)
     download_file(url, save_file)
-    extract_tar_gz(save_file, extract_dir)
+    extract_tar_gz(save_file, extract_path)
 
 # Called from main.py.
-def run_extract_text(extract_dir, output_dir, split="sentences", output_file="output.json",
+def run_extract_text(extract_path, output_path, split="sentences", output_file="output.json",
                      batch_size=1000, random_sel=0, max_threads=1):
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    Path(output_path).mkdir(parents=True, exist_ok=True)
     stem = Path(output_file).stem
     suffix = Path(output_file).suffix
     path = os.path.dirname(output_file)
     #
-    # os.path.join(extract_dir, f)
-    files = [os.path.join(extract_dir, f)
-             for f in os.listdir(extract_dir)
-             if os.path.isfile(os.path.join(extract_dir, f))]
+    # os.path.join(extract_path, f)
+    files = [os.path.join(extract_path, f)
+             for f in os.listdir(extract_path)
+             if os.path.isfile(os.path.join(extract_path, f))]
     if random_sel > 0:
         files = random.sample(files, random_sel)
     threads = []
@@ -208,7 +208,7 @@ def run_extract_text(extract_dir, output_dir, split="sentences", output_file="ou
         ignore = ["ACK_FUND", "AUTH_CONT", "COMP_INT", "FIG", "TABLE", "ABBR", "REF"]
         for i, batch in enumerate(chunks(files, batch_size)):
             output_file = os.path.join(path, stem+"-{:04n}".format(i)+suffix)
-            output_file = os.path.join(output_dir, output_file)
+            output_file = os.path.join(output_path, output_file)
             thread = Thread(target=process_files, args=(batch, output_file),
                             kwargs={'allowed_sections':allow,
                                     'ignored_sections':ignore,
@@ -228,12 +228,12 @@ def run_extract_text(extract_dir, output_dir, split="sentences", output_file="ou
 if __name__ == "__main__":
     if len(sys.argv) == 4:
         filename = sys.argv[1]
-        save_dir = sys.argv[2]
-        extract_dir = sys.argv[3]
-        run_full_text_downloader(filename, save_dir, extract_dir)
+        save_path = sys.argv[2]
+        extract_path = sys.argv[3]
+        run_full_text_downloader(filename, save_path, extract_path)
     if len(sys.argv) == 3:
-        extract_dir = sys.argv[1]
-        output_dir = sys.argv[2]
+        extract_path = sys.argv[1]
+        output_path = sys.argv[2]
         # Testing with a random selection of 100000 and 12 threads.
-        run_extract_text(extract_dir, output_dir, max_threads=4)
+        run_extract_text(extract_path, output_path, max_threads=4)
     
