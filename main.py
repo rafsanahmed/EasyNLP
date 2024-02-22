@@ -295,29 +295,29 @@ def run_download_archive(dl_ar_config: dict, ignore: bool):
     print("Running download_archive script.")
     print(dl_ar_config)
     # def run_full_text_downloader(filename, save_dir, extract_dir):
-    downloader_archive.run_full_text_downloader(
-        dl_ft_config["archive"],
-        dl_ft_config["output_path"],
-        dl_ft_config["extract_path"]
+    download_archive.run_full_text_downloader(
+        dl_ar_config["archive"],
+        dl_ar_config["save_path"],
+        dl_ar_config["extract_path"]
     )
     print("Finished running download_archive script.")
     
-def run_extract_text(dl_ar_config: dict, ignore: bool):
+def run_extract_text(dl_et_config: dict, ignore: bool):
     if ignore:
         print("Ignoring script: extract_text.")
         return
 
     print("Running extract_text script.")
-    print(dl_ar_config)
+    print(dl_et_config)
     # run_extract_text(extract_dir, output_dir, split="sentences", output_file="output.json",
     #                  batch_size=1000, random_sel=0, max_threads=1):
-    downloader_archive.run_full_text_downloader(
-        dl_ft_config["extract_path"],
-        dl_ft_config["output_path"],
-        split=dl_ft_config["split"],
-        output_file=dl_ft_config["output_file"],
-        batch_size=dl_ft_config["batch_size"],
-        max_treads=dl_ft_config["max_threads"]
+    download_archive.run_extract_text(
+        dl_et_config["extract_path"],
+        dl_et_config["output_path"],
+        split=dl_et_config["split"],
+        output_file=dl_et_config["output_file"],
+        batch_size=dl_et_config["batch_size"],
+        max_threads=dl_et_config["max_threads"]
     )
     print("Finished running download_archive script.")
 
@@ -381,7 +381,7 @@ if __name__ == "__main__":
     run_splitter_ft(config["splitter_ft"], ignore=ignore["splitter_ft"])
     print()
 
-    run_full_text_downloader(config["download_archive"], ignore=ignore["download_archive"])
+    run_download_archive(config["download_archive"], ignore=ignore["download_archive"])
     print()
 
     run_extract_text(config["extract_text"], ignore=ignore["extract_text"])
