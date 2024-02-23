@@ -7,6 +7,7 @@ from spacy.lang.en import English
 from pathlib import Path
 import random
 from threading import Thread
+import pysbd #pip install pysbd
 
 # Hardcoded for now.
 URLBASE = "https://ftp.ncbi.nlm.nih.gov/pub/wilbur/BioC-PMC"
@@ -91,18 +92,26 @@ def extract_title(data: dict) -> str:
         
 # Convert the result of extract_fulltext_data() to
 # sentences.
-def texts_to_sentences(section_texts: dict) -> dict:
+def texts_to_sentences(section_texts: dict, segmenter) -> dict:
     if not section_texts:
         return None
     data = {}
-    nlp = English()
-    nlp.add_pipe("sentencizer")
-    for sec in section_texts:
-        data[sec] = []
-        for paragraph in section_texts[sec]:
-            doc = nlp(paragraph) #nlp("This is a sentence. This is another sentence.")
-            for sentence in doc.sents:
-                data[sec].append(str(sentence))
+    if False:
+        nlp = English()
+        nlp.add_pipe("sentencizer") # Should not be instantiated here!
+        for sec in section_texts:
+            data[sec] = []
+            for paragraph in section_texts[sec]:
+                doc = nlp(paragraph) #nlp("This is a sentence. This is another sentence.")
+                for sentence in doc.sents:
+                    data[sec].append(str(sentence))
+    else:
+        for sec in section_texts:
+            data[sec] = []
+            for paragraph in section_texts[sec]:
+                doc = segmenter.segment(paragraph)
+                for sentence in doc:
+                    data[sec].append(str(sentence))
     #return(json.dumps(data)) # string
     return data
 
@@ -123,7 +132,7 @@ def texts_to_paragraphs(section_texts: dict) -> dict:
 # The JSON structs for all files are written to the output_file.
 # Output is a list: [PMID:{title:{}, sentences:[text:{...}]}, ...]
 def process_files(filelist, output_file, allowed_sections=[], ignored_sections=[],
-                  split="sentences", progress_bar=None):
+                  split="sentences", progress_bar=None, segmenter=None):
     full_output = {}
     full_batch_output = []
     for filename in filelist:
@@ -133,7 +142,7 @@ def process_files(filelist, output_file, allowed_sections=[], ignored_sections=[
         md = extract_metadata(ft)
         title = extract_title(ft)
         if split == "sentences":
-            ss = texts_to_sentences(st)
+            ss = texts_to_sentences(st, segmenter)
         else:
             ss = texts_to_paragraphs(st)
         #print(ss)
@@ -207,12 +216,13 @@ def run_extract_text(extract_path, output_path, split="sentences", output_file="
         allow = []
         ignore = ["ACK_FUND", "AUTH_CONT", "COMP_INT", "FIG", "TABLE", "ABBR", "REF"]
         for i, batch in enumerate(chunks(files, batch_size)):
-            output_file = os.path.join(path, stem+"-{:04n}".format(i)+suffix)
+            output_file = os.path.join(path, stem+"-{:04d}".format(i)+suffix)
             output_file = os.path.join(output_path, output_file)
+            seg = pysbd.Segmenter(language="en", clean=False) 
             thread = Thread(target=process_files, args=(batch, output_file),
                             kwargs={'allowed_sections':allow,
                                     'ignored_sections':ignore,
-                                    'split':split, 'progress_bar':progress_bar}
+                                    'split':split, 'progress_bar':progress_bar, 'segmenter':seg}
                             )
             thread.start()
             threads.append(thread)
@@ -235,5 +245,4 @@ if __name__ == "__main__":
         extract_path = sys.argv[1]
         output_path = sys.argv[2]
         # Testing with a random selection of 100000 and 12 threads.
-        run_extract_text(extract_path, output_path, max_threads=4)
-    
+        run_extract_text(extract_path, output_path, max_threads=4, output_file="sentences.json")

@@ -46,3 +46,4 @@ dependencies:
     - spacy-legacy==3.0.11
     - spacy-loggers==1.0.4
     - unidecode==1.3.6
+    - pysbd
