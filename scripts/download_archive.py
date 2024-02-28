@@ -127,14 +127,13 @@ def texts_to_paragraphs(section_texts: dict) -> dict:
     #return(json.dumps(data)) # string
     return data
 
-# Processes the files in filelist. Extracts the texts from each file, oprionally
+# Processes the files in filelist. Extracts the texts from each file, optionally
 # converts to it to sentences, and creates a new JSON structure.
 # The JSON structs for all files are written to the output_file.
 # Output is a list: [PMID:{title:{}, sentences:[text:{...}]}, ...]
 def process_files(filelist, output_file, allowed_sections=[], ignored_sections=[],
                   split="sentences", progress_bar=None, segmenter=None):
     full_output = {}
-    full_batch_output = []
     for filename in filelist:
         with open(filename, "r") as fin:
             ft = json.loads(fin.read())
@@ -160,12 +159,9 @@ def process_files(filelist, output_file, allowed_sections=[], ignored_sections=[
         full_output[md] = output
         if progress_bar:
             progress_bar.update(1)
-    full_batch_output.append(full_output)
-    #Return json.dumps(full_output)
-    #full_batch_output.append(json.dumps(full_output)) # The left-overs.
-    if len(full_batch_output) > 0:
+    if len(full_output) > 0:
         with open(output_file, "w") as fout:
-            fout.write(json.dumps(full_batch_output)) 
+            fout.write(json.dumps(full_output)) 
 
 def chunks(lst, n):
     # Yield successive n-sized chunks from lst.
