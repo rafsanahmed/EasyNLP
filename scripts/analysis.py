@@ -146,7 +146,7 @@ def run(analysis_config):
         
         path_ = analysis_config["output_path"] + "/analysis_{}/".format(entity)
         os.makedirs(path_, exist_ok=True)
-        plt.savefig(path_+"{}_top_{}.png".format( entity,n), bbox_inches="tight", aspect="auto", format="png")
+        plt.savefig(path_+"{}_top_{}.png".format( entity,n), bbox_inches="tight", format="png")
         df.to_csv(path_+"result_{}.tsv".format(entity), sep="\t")
     
 
