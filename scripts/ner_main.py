@@ -191,6 +191,12 @@ def convert_dataset_to_dict(articles, ner_dataset):
     returns: articles dictionary with added entities and spans
     '''
 
+    # To fix a bug in the archive splitter, it generates
+    # a list instead of a dict. This fix allows the code to
+    # process the allready generated json files.
+    if type(articles) is list:
+        articles = articles[0]
+
     for row in ner_dataset:
         pmid = row["pmid"]
         sent_idx = row["sent_idx"]
