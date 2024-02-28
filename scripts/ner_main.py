@@ -161,7 +161,13 @@ def biobert_process_articles(articles, column_names=["pmid", "sent_idx", "text"]
 
     
     articles_processed = []
-    
+
+    # To fix a bug in the archive splitter, it generates
+    # a list instead of a dict. This fix allows the code to
+    # process the allready generated json files.
+    if type(articles) is list:
+        articles = articles[0]
+        
     for pmid, content in articles.items():
         l = []
         sent_idx = 0
